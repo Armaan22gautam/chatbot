@@ -11,7 +11,19 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  isUserTyping: false,
+  typingUserId: null,
   isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
+
+  emitTyping: (receiverId) => {
+    const socket = useAuthStore.getState().socket;
+    if (socket) socket.emit("typing", { receiverId });
+  },
+
+  emitStopTyping: (receiverId) => {
+    const socket = useAuthStore.getState().socket;
+    if (socket) socket.emit("stopTyping", { receiverId });
+  },
 
   toggleSound: () => {
     localStorage.setItem("isSoundEnabled", !get().isSoundEnabled);
@@ -104,10 +116,24 @@ export const useChatStore = create((set, get) => ({
         notificationSound.play().catch((e) => console.log("Audio play failed:", e));
       }
     });
+
+    socket.on("typing", ({ senderId }) => {
+      if (selectedUser && selectedUser._id === senderId) {
+        set({ isUserTyping: true, typingUserId: senderId });
+      }
+    });
+
+    socket.on("stopTyping", ({ senderId }) => {
+      if (selectedUser && selectedUser._id === senderId) {
+        set({ isUserTyping: false, typingUserId: null });
+      }
+    });
   },
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
     socket.off("newMessage");
+    socket.off("typing");
+    socket.off("stopTyping");
   },
 }));

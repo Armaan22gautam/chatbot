@@ -1,17 +1,19 @@
 import "dotenv/config";
+import { cleanEnv, str, port, url } from "envalid";
 
-export const ENV = {
-  PORT: process.env.PORT,
-  MONGO_URI: process.env.MONGO_URI,
-  JWT_SECRET: process.env.JWT_SECRET,
-  NODE_ENV: process.env.NODE_ENV,
-  CLIENT_URL: process.env.CLIENT_URL,
-  RESEND_API_KEY: process.env.RESEND_API_KEY,
-  EMAIL_FROM: process.env.EMAIL_FROM,
-  EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME,
-  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
-  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
-  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
-  ARCJET_KEY: process.env.ARCJET_KEY,
-  ARCJET_ENV: process.env.ARCJET_ENV,
-};
+export const ENV = cleanEnv(process.env, {
+  PORT: port({ default: 3000 }),
+  MONGO_URI: str(),
+  JWT_SECRET: str(),
+  NODE_ENV: str({ choices: ["development", "test", "production"] }),
+  CLIENT_URL: url(),
+  RESEND_API_KEY: str(),
+  EMAIL_FROM: str(),
+  EMAIL_FROM_NAME: str(),
+  CLOUDINARY_CLOUD_NAME: str(),
+  CLOUDINARY_API_KEY: str(),
+  CLOUDINARY_API_SECRET: str(),
+  ARCJET_KEY: str(),
+  ARCJET_ENV: str({ choices: ["development", "test", "production"] }),
+  MESSAGE_ENCRYPTION_KEY: str(),
+});

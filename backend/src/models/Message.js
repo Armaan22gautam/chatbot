@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import mongooseFieldEncryption from "mongoose-field-encryption";
+import { ENV } from "../lib/env.js";
+
+const { fieldEncryption } = mongooseFieldEncryption;
 
 const messageSchema = new mongoose.Schema(
   {
@@ -23,6 +27,11 @@ const messageSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+messageSchema.plugin(fieldEncryption, {
+  fields: ["text", "image"],
+  secret: ENV.MESSAGE_ENCRYPTION_KEY,
+});
 
 const Message = mongoose.model("Message", messageSchema);
 
